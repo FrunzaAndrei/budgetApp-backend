@@ -1,11 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const auth = require('../../middleware/auth');
-const { check, validationResult } = require('express-validator');
 
 const Budget = require('../../models/Budget');
-const User = require('../../models/User');
-const { profile_url } = require('gravatar');
 
 // @route   GET api/budget
 // @desc    Get my budget
