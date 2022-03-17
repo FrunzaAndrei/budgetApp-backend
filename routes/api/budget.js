@@ -5,6 +5,7 @@ const { check, validationResult } = require('express-validator');
 
 const Budget = require('../../models/Budget');
 const User = require('../../models/User');
+const { profile_url } = require('gravatar');
 
 // @route   GET api/budget
 // @desc    Get my budget
@@ -51,6 +52,27 @@ router.post('/', auth, async (req, res) => {
 
     //Create
     budget = new Budget(budgetObj);
+    await budget.save();
+    res.json(budget);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send('Server Error');
+  }
+});
+
+// @route   DELETE api/budget/spenditure/:spend_id
+// @desc    Delete a specific spenditure from budget
+// @access  Private
+
+router.delete('/spenditure/:spend_id', auth, async (req, res) => {
+  try {
+    const budget = await Budget.findOne({ user: req.user.id });
+
+    const removeIndex = budget.spenditure
+      .map((item) => item.id)
+      .indexOf(req.params.spend_id);
+    budget.spenditure.splice(removeIndex, 1);
+
     await budget.save();
     res.json(budget);
   } catch (err) {

@@ -4,8 +4,10 @@ const { check, validationResult } = require('express-validator');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const config = require('config');
+const auth = require('../../middleware/auth');
 
 const User = require('../../models/User');
+const Budget = require('../../models/Budget');
 
 // @route   POST api/users
 // @desc    Register user
@@ -69,5 +71,23 @@ router.post(
     }
   }
 );
+
+// @route   DELETE api/user
+// @desc    DELETE user
+// @access  Public
+router.delete('/', auth, async (req, res) => {
+  try {
+    //Remove budget
+    await Budget.findOneAndRemove({ user: req.user.id });
+
+    //Remove user
+    await User.findOneAndRemove({ _id: req.user.id });
+
+    res.json({ msg: 'User deleted' });
+  } catch (err) {
+    console.log(err.message);
+    res.status(500).send('Server Error');
+  }
+});
 
 module.exports = router;
